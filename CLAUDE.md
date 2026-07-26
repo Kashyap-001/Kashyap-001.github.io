@@ -90,6 +90,26 @@ mobile resolution tuning (`useMediaQuery('(min-width: 700px)')` gates `simResolu
 `dyeResolution`) were changed. Touch support (`touchstart`/`touchmove`/`touchend`) was already
 in the original and carried over unchanged. Gated off entirely under `prefers-reduced-motion`.
 
+**Stacking order**: the canvas wrapper is `-z-10` (behind normal page content, still above the
+plain body background) — it was originally `z-200` and visibly washed out over buttons/text.
+Plain non-positioned or `position:relative`-with-`z-index:auto` content stacks correctly above
+it on just the negative z-index alone, **but** elements with an actively-running Framer Motion
+animation (e.g. `CtaButton`'s animated gradient border, `AboutFlipCard`'s `rotateY` flip) didn't
+reliably win the stacking order against the canvas — both apparently get GPU-compositing-layer
+promoted, and compositing order between two promoted layers didn't follow plain CSS z-index
+rules as expected. Fix was giving those specific elements an **explicit** `relative z-10` rather
+than relying on implicit `z-index: auto`. If a future animated element visually gets washed out
+by the fluid effect, this is almost certainly why — give it an explicit z-index.
+
+### Nav logo
+
+`Nav.tsx`'s logo is a terminal-prompt mark (`>_kp`, green prompt + heading-color initials +
+blinking cursor block), not plain text — deliberately extends the site's existing CLI/terminal
+language (numbered section labels, monospace everywhere) rather than introducing a new motif.
+The blink is a plain CSS `@keyframes` (`--animate-cursor-blink` in `src/index.css`, alongside
+the pre-existing `pulse-dot` one), with a `prefers-reduced-motion` override — not Framer Motion,
+since it's a simple infinite loop with no scroll/interaction tie-in.
+
 ### Deployment
 
 Deploys through Cloudflare's own dashboard Git integration only — every push to `main` triggers
