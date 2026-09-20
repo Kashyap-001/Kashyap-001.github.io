@@ -1,7 +1,9 @@
 {
+  // This Worker no longer hosts the site — GitHub Pages does
+  // (https://kashyap-001.github.io, see .github/workflows/deploy.yml).
+  // It stays deployed purely to 301 the old workers.dev URL, which is still
+  // printed in CV PDFs already sent to recruiters. See worker.js.
   "name": "kashyap",
-  "compatibility_date": "2026-07-24",
-  "assets": {
-    "directory": "./dist"
-  }
+  "main": "worker.js",
+  "compatibility_date": "2026-07-24"
 }
